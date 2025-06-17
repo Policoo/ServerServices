@@ -1,0 +1,3 @@
+.env
+pihole/etc-pihole/*
+!pihole/etc-pihole/pihole.toml
