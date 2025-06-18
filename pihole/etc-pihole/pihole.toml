@@ -1,7 +1,7 @@
 # Pi-hole configuration file (v6.2.3)
 # Encoding: UTF-8
 # This file is managed by pihole-FTL
-# Last updated on 2025-06-17 23:45:10 CEST
+# Last updated on 2025-06-18 19:05:43 CEST
 
 [dns]
   # Array of upstream DNS servers used by Pi-hole
@@ -10,9 +10,9 @@
   # Possible values are:
   #     array of IP addresses and/or hostnames, optionally with a port (#...)
   upstreams = [
-    "8.8.8.8",
-    "8.8.4.4"
-  ] ### CHANGED, default = []
+    "1.1.1.1",
+    "9.9.9.9"
+  ] ### CHANGED (env), default = []
 
   # Use this option to control deep CNAME inspection. Disabling it might be beneficial
   # for very low-end devices
@@ -190,7 +190,7 @@
   #       configuration file. This is useful if you want to manually configure the
   #       listening mode in auxiliary configuration files. This option is really meant
   #       for advanced users only, support for this option may be limited.
-  listeningMode = "LOCAL"
+  listeningMode = "ALL" ### CHANGED (env), default = "LOCAL"
 
   # Log DNS queries and replies to pihole.log
   queryLogging = true
@@ -812,7 +812,7 @@
     #
     # Possible values are:
     #     <valid Pi-hole password hash>
-    pwhash = "$BALLOON-SHA256$v=1$s=1024,t=32$xZf4xcaElURfWnPz2WYHTQ==$rSGW/nW6KYpmArEqzVVbphuRIAhwYE6GO8YoJEh/u0c=" ### CHANGED, default = ""
+    pwhash = "$BALLOON-SHA256$v=1$s=1024,t=32$rFKE4KkiUT3SuDEcvjAGJQ==$aMqqzsNcwTNTzWhq7WJ+JkIWEDP0v2oE8MUjx61Eibg=" ### CHANGED, default = ""
 
     # Pi-hole 2FA TOTP secret. When set to something different than "", 2FA authentication
     # will be enforced for the API and the web interface. This setting is write-only, you
@@ -1196,6 +1196,8 @@
   all = false
 
 # Configuration statistics:
-# 155 total entries out of which 152 entries are default
-# --> 3 entries are modified
-
+# 155 total entries out of which 151 entries are default
+# --> 4 entries are modified
+# 2 entries are forced through environment:
+#   - dns.upstreams
+#   - dns.listeningMode

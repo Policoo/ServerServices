@@ -1,35 +1,12 @@
 version: "3.8"
 
 services:
-  # 1) Pi-hole container (DNS & Web UI)
-  pihole:
-    image: pihole/pihole:latest
-    container_name: pihole
-    restart: unless-stopped
-    environment:
-      TZ: "Europe/Amsterdam"
-      WEBPASSWORD: "<set-a-strong-password>"
-      DNS1: "1.1.1.1"
-      DNS2: "9.9.9.9"
-      ServerIP: "192.168.0.170"
-      DNSMASQ_LISTENING: "all"
-    volumes:
-      - ./pihole/etc-pihole:/etc/pihole
-      - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
-    ports:
-      - "53:53/tcp"   # DNS
-      - "53:53/udp"
-    networks:
-      - web
-
-  # 2) Reverse-proxy for all HTTP(S) services
   proxy:
     image: nginx:alpine
     container_name: reverse-proxy
     restart: unless-stopped
     depends_on:
       - pihole
-      # - app1, - app2, etc.
     ports:
       - "80:80"      # HTTP entrypoint
       - "443:443"    # HTTPS (if you add certs later)
@@ -40,19 +17,23 @@ services:
     networks:
       - web
 
-  # 3) Example: Your first app
-  # app1:
-  #   image: your-app1-image
-  #   container_name: app1
-  #   restart: unless-stopped
-  #   networks:
-  #     - web
-
-  # 4) Add more services here...
-  # app2:
-  #   image: your-app2-image
-  #   networks:
-  #     - web
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Amsterdam"
+      FTLCONF_webserver_api_password: "${PIHOLE_WEBPASS}"
+      FTLCONF_dns_listeningMode: "all"
+      FTLCONF_dns_upstreams: "${PIHOLE_DNS_UPSTREAMS}"
+    volumes:
+      - ./pihole/etc-pihole:/etc/pihole
+      - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+    ports:
+      - "53:53/tcp"   # DNS
+      - "53:53/udp"
+    networks:
+      - web
 
 networks:
   web:
