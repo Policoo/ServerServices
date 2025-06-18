@@ -1,9 +1,13 @@
 name: Deploy to Pi
+
 on:
+  push:
+    branches: [ main ] 
   workflow_dispatch:
 
 jobs:
   deploy:
+    if: github.event_name == 'workflow_dispatch'  
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
