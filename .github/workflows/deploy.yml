@@ -1,7 +1,6 @@
 name: Deploy to Pi
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -18,12 +17,12 @@ jobs:
           if [ -n "${{ secrets.KNOWN_HOSTS }}" ]; then
             echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           else
-            ssh-keyscan inshellgagici.lan >> ~/.ssh/known_hosts
+            ssh-keyscan inshellgagici >> ~/.ssh/known_hosts
           fi
 
       - name: Deploy
         run: |
-          ssh paul@inshellgagici.lan << 'EOF'
+          ssh paul@inshellgagici << 'EOF'
             cd /home/paul/ServerServices
             git pull origin main
             docker compose pull
