@@ -1,0 +1,31 @@
+name: Deploy to Pi
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          sudo apt-get update && sudo apt-get install -y openssh-client
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_SERVER_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          if [ -n "${{ secrets.KNOWN_HOSTS }}" ]; then
+            echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan inshellgagici.lan >> ~/.ssh/known_hosts
+          fi
+
+      - name: Deploy
+        run: |
+          ssh paul@inshellgagici.lan << 'EOF'
+            cd /home/paul/ServerServices
+            git pull origin main
+            docker compose pull
+            docker compose up -d
+          EOF

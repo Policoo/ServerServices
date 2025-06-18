@@ -34,6 +34,14 @@ services:
       - "53:53/udp"
     networks:
       - web
+    
+    test:
+      image: busybox:latest
+      container_name: test
+      restart: unless-stopped
+      command: tail -f /dev/null
+      networks:
+        - web
 
 networks:
   web:
