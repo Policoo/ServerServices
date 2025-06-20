@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: [self-hosted, linux, ARM64]
+    environment: Production
     steps:
       - name: Fix permissions
         run: |
