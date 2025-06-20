@@ -1,34 +1,39 @@
-name: Deploy to Pi
+name: Deploy on Pi
 
 on:
   push:
-    branches: [ main ] 
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch'  
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, ARM64]
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup SSH
+      - name: Prepare workspace directories
         run: |
-          sudo apt-get update && sudo apt-get install -y openssh-client
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_SERVER_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          if [ -n "${{ secrets.KNOWN_HOSTS }}" ]; then
-            echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
-          else
-            ssh-keyscan inshellgagici >> ~/.ssh/known_hosts
-          fi
+          mkdir -p "$GITHUB_WORKSPACE/etc-dnsmasq.q" "$GITHUB_WORKSPACE/etc-pihole"
+        
+      - name: Write .env from secret
+        env:
+          ENV_FILE_B64: ${{ secrets.ENV_FILE_B64 }}
+        run: |
+          echo "$ENV_FILE_B64" | base64 -d > .env
+          chmod 600 .env
 
-      - name: Deploy
+      - name: Verify .env
         run: |
-          ssh paul@inshellgagici << 'EOF'
-            cd /home/paul/ServerServices
-            git pull origin main
-            docker compose pull
-            docker compose up -d
-          EOF
+          if [[ ! -f .env ]]; then
+            echo "❌ .env not found" && exit 1
+          fi
+          echo ".env exists, size: $(stat -c '%s' .env) bytes"
+          echo "  → lines: $(wc -l < .env)"
+          echo "  → keys:"
+          cut -d= -f1 .env | sed 's/^/    - /'
+
+      - name: Pull and restart containers
+        working-directory: ${{ github.workspace }}
+        run: |
+          docker compose pull
+          docker compose up -d --remove-orphans

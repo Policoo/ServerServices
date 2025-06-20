@@ -26,6 +26,8 @@ services:
       FTLCONF_webserver_api_password: "${PIHOLE_WEBPASS}"
       FTLCONF_dns_listeningMode: "all"
       FTLCONF_dns_upstreams: "${PIHOLE_DNS_UPSTREAMS}"
+      FTLCONF_misc_etc_dnsmasq_d: "true"
+      FTLCONF_misc_dnsmasq_lines: "address=/.${DOMAIN}/${HOST_IP}"
     volumes:
       - ./pihole/etc-pihole:/etc/pihole
       - ./pihole/etc-dnsmasq.d:/etc/dnsmasq.d
@@ -34,14 +36,6 @@ services:
       - "53:53/udp"
     networks:
       - web
-    
-    test:
-      image: busybox:latest
-      container_name: test
-      restart: unless-stopped
-      command: tail -f /dev/null
-      networks:
-        - web
 
 networks:
   web:
