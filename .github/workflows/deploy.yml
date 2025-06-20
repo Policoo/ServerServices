@@ -9,6 +9,10 @@ jobs:
   deploy:
     runs-on: [self-hosted, linux, ARM64]
     steps:
+      - name: Fix permissions
+        run: |
+          sudo chown -R $USER:$USER /home/paul/actions-runner/_work/ServerServices || true
+
       - uses: actions/checkout@v4
 
       - name: Prepare workspace directories
