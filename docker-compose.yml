@@ -35,7 +35,7 @@ services:
       - "53:53/udp"
     networks:
       - web
-  
+ 
   filebrowser:
     image: filebrowser/filebrowser:v2-s6
     container_name: filebrowser
