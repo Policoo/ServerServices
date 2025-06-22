@@ -25,7 +25,6 @@ services:
       TZ: "Europe/Amsterdam"
       FTLCONF_webserver_api_password: "${PIHOLE_WEBPASS}"
       FTLCONF_dns_listeningMode: "all"
-      FTLCONF_dns_upstreams: "${PIHOLE_DNS_UPSTREAMS}"
       FTLCONF_misc_etc_dnsmasq_d: "true"
       FTLCONF_misc_dnsmasq_lines: "address=/.${DOMAIN}/${HOST_IP}"
     volumes:
