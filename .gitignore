@@ -2,3 +2,5 @@
 pihole/
 env.b64
 filebrowser/
+netdata/
+netdata-config/

@@ -51,6 +51,30 @@ services:
     networks:
       - web
 
+  netdata:
+    image: netdata/netdata:v1.47.4
+    container_name: netdata
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+      - SYS_TIME
+    environment:
+      NETDATA_DISABLE_CLOUD: "1"
+      NETDATA_REQUIRE_CLOUD: "0"
+      DO_NOT_TRACK: "1"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+      - ${DATA_STORAGE_BASE_DIR}/netdata-config:/etc/netdata
+      - ${DATA_STORAGE_BASE_DIR}/netdata/lib:/var/lib/netdata
+      - ${DATA_STORAGE_BASE_DIR}/netdata/cache:/var/cache/netdata
+    networks:
+      - web
+
 networks:
   web:
     driver: bridge
