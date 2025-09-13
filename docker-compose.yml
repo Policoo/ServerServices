@@ -8,8 +8,8 @@ services:
     depends_on:
       - pihole
     ports:
-      - "80:80"      # HTTP entrypoint
-      - "443:443"    # HTTPS (if you add certs later)
+      - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/inshellgagici.conf.template:/etc/nginx/templates/inshellgagici.conf.template:ro
     environment:
