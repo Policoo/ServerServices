@@ -21,35 +21,46 @@ services:
     image: pihole/pihole:latest
     container_name: pihole
     restart: unless-stopped
+
+    # Required for DHCP to work cleanly from Docker
+    network_mode: "host"
+
+    # Recommended/needed for DHCP-related network operations
+    cap_add:
+      - NET_ADMIN
+
     environment:
       TZ: "Europe/Amsterdam"
+
+      # Web UI password
       FTLCONF_webserver_api_password: "${PIHOLE_WEBPASS}"
+
+      # Important: nginx already owns port 80, so Pi-hole web UI moves to 8081
+      FTLCONF_webserver_port: "8081"
+      FTLCONF_webserver_domain: "pihole.${DOMAIN}"
+
+      # DNS
       FTLCONF_dns_listeningMode: "all"
-      FTLCONF_misc_etc_dnsmasq_d: "true"
-      FTLCONF_misc_dnsmasq_lines: "address=/.${DOMAIN}/${HOST_IP}"
+      FTLCONF_dns_upstreams: "${PIHOLE_DNS_UPSTREAMS}"
+
+      # Local wildcard DNS:
+      # pihole.inshellgagici.lan, filebrowser.inshellgagici.lan, etc -> Pi IP
+      FTLCONF_misc_dnsmasq_lines: "address=/${DOMAIN}/${HOST_IP}"
+
+      # DHCP server
+      FTLCONF_dhcp_active: "true"
+      FTLCONF_dhcp_start: "192.168.178.50"
+      FTLCONF_dhcp_end: "192.168.178.250"
+      FTLCONF_dhcp_router: "192.168.178.1"
+      FTLCONF_dhcp_netmask: "255.255.255.0"
+      FTLCONF_dhcp_leaseTime: "24h"
+
+      # Optional, but useful because some devices try to sneak in extra DNS
+      FTLCONF_dhcp_multiDNS: "true"
+
     volumes:
       - ${DATA_STORAGE_BASE_DIR}/pihole/etc-pihole:/etc/pihole
       - ${DATA_STORAGE_BASE_DIR}/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-    networks:
-      - web
- 
-  filebrowser:
-    image: filebrowser/filebrowser:v2-s6
-    container_name: filebrowser
-    restart: unless-stopped
-    environment:
-      FB_DATABASE: "/config/database.db"
-      FB_ROOT: "/srv"
-      FB_USERNAME: ${FB_USER}
-      FB_PASSWORD: ${FB_PASS}
-    volumes:
-      - ${DATA_STORAGE_BASE_DIR}/filebrowser/nas-data:/srv
-      - ${DATA_STORAGE_BASE_DIR}/filebrowser/config:/config
-    networks:
-      - web
 
   netdata:
     image: netdata/netdata:v1.47.4
