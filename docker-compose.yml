@@ -62,6 +62,21 @@ services:
       - ${DATA_STORAGE_BASE_DIR}/pihole/etc-pihole:/etc/pihole
       - ${DATA_STORAGE_BASE_DIR}/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
 
+  filebrowser:
+    image: filebrowser/filebrowser:v2-s6
+    container_name: filebrowser
+    restart: unless-stopped
+    environment:
+      FB_DATABASE: "/config/database.db"
+      FB_ROOT: "/srv"
+      FB_USERNAME: ${FB_USER}
+      FB_PASSWORD: ${FB_PASS}
+    volumes:
+      - ${DATA_STORAGE_BASE_DIR}/filebrowser/nas-data:/srv
+      - ${DATA_STORAGE_BASE_DIR}/filebrowser/config:/config
+    networks:
+      - web
+
   netdata:
     image: netdata/netdata:v1.47.4
     container_name: netdata
