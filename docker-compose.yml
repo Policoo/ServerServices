@@ -14,7 +14,6 @@ services:
       - ./nginx/inshellgagici.conf.template:/etc/nginx/templates/inshellgagici.conf.template:ro
     environment:
       DOMAIN: "${DOMAIN}"
-      HOST_IP: "${HOST_IP}"
     networks:
       - web
 
