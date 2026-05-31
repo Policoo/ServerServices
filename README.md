@@ -2,7 +2,7 @@
 
 This project sets up a home server on a Raspberry Pi with Docker Compose, featuring:
 - **Pi-hole**: Network-wide ad blocking and DNS server
-- **Nginx**: Reverse proxy for routing services to containers
+- **Caddy**: Reverse proxy with LAN-only HTTPS using an internal CA
 
 ## Quick Setup
 
@@ -15,34 +15,38 @@ cp .env.example .env
 
 ## Service Setup
 
-### Nginx (Reverse Proxy)
+### Caddy (Reverse Proxy)
 
-Nginx handles routing requests to different services based on subdomains.
+Caddy handles routing requests to different services based on subdomains and
+issues LAN-only HTTPS certificates using its internal certificate authority.
 
 **Current Configuration:**
-- Routes `pihole.inshellgagici.localhost` to the Pi-hole container
-- Listens on ports 80 (HTTP) and 443 (HTTPS ready)
+- Routes `pihole.${DOMAIN}` to the Pi-hole container
+- Routes `filebrowser.${DOMAIN}` to the File Browser container
+- Routes `netdata.${DOMAIN}` to the Netdata container
+- Routes `couchdb.${DOMAIN}` to the CouchDB container
+- Listens on ports 80 and 443
+
+For mobile apps that require HTTPS, install Caddy's local root certificate on
+the device and fully trust it. With the default storage layout, the certificate
+is created after Caddy starts at:
+
+```bash
+${DATA_STORAGE_BASE_DIR}/caddy/data/caddy/pki/authorities/local/root.crt
+```
 
 **Adding New Services:**
 1. Add your new service to `docker-compose.yml`
-2. Create a new server block in `nginx/inshellgagici.conf.template`:
+2. Create a new site block in `caddy/Caddyfile`:
 
-```nginx
-server {
-  listen 80;
-  server_name newservice.${DOMAIN};
-
-  location / {
-    proxy_pass         http://newservice:port;
-    proxy_set_header   Host $host;
-    proxy_set_header   X-Real-IP $remote_addr;
-    proxy_http_version 1.1;
-    proxy_set_header   Connection "";
-  }
+```caddyfile
+newservice.{$DOMAIN} {
+  tls internal
+  reverse_proxy newservice:port
 }
 ```
 
-3. Restart nginx: `docker-compose restart proxy`
+3. Restart Caddy: `docker compose restart caddy`
 
 ### Pi-hole (DNS & Ad Blocking)
 
@@ -59,7 +63,7 @@ sudo chown -R $USER:$USER pihole/
 ```
 
 **Configuration Notes:**
-- Web interface accessible at `http://pihole.inshellgagici.localhost/admin/`
+- Web interface accessible at `https://pihole.inshellgagici.lan/admin/`
 - DNS server runs on port 53 (TCP/UDP)
 
 > **⚠️ IMPORTANT: Manual DNS Entry Fix**

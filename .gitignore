@@ -4,3 +4,5 @@ env.b64
 filebrowser/
 netdata/
 netdata-config/
+caddy/data/
+caddy/config/

@@ -1,17 +1,22 @@
 version: "3.8"
 
 services:
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
     restart: unless-stopped
     depends_on:
       - pihole
+      - filebrowser
+      - netdata
+      - couchdb
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/inshellgagici.conf.template:/etc/nginx/templates/inshellgagici.conf.template:ro
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${DATA_STORAGE_BASE_DIR}/caddy/data:/data
+      - ${DATA_STORAGE_BASE_DIR}/caddy/config:/config
     environment:
       DOMAIN: "${DOMAIN}"
     networks:

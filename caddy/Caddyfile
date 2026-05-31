@@ -1,0 +1,29 @@
+{
+	local_certs
+}
+
+pihole.{$DOMAIN} {
+	tls internal
+
+	redir / /admin/ 302
+	reverse_proxy pihole:80
+}
+
+filebrowser.{$DOMAIN} {
+	tls internal
+
+	redir / /login/ 302
+	reverse_proxy filebrowser:80
+}
+
+netdata.{$DOMAIN} {
+	tls internal
+
+	reverse_proxy netdata:19999
+}
+
+couchdb.{$DOMAIN} {
+	tls internal
+
+	reverse_proxy couchdb:5984
+}
