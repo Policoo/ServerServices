@@ -18,7 +18,7 @@ services:
       - web
 
   pihole:
-    image: pihole/pihole:latest
+    image: pihole/pihole:2026.05.0
     container_name: pihole
     restart: unless-stopped
     environment:
@@ -72,6 +72,22 @@ services:
       - ${DATA_STORAGE_BASE_DIR}/netdata-config:/etc/netdata
       - ${DATA_STORAGE_BASE_DIR}/netdata/lib:/var/lib/netdata
       - ${DATA_STORAGE_BASE_DIR}/netdata/cache:/var/cache/netdata
+    networks:
+      - web
+
+  couchdb:
+    image: couchdb:3.5.2
+    container_name: obsidian-livesync-couchdb
+    user: 5984:5984
+    environment:
+      COUCHDB_USER: obsidian
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+    volumes:
+      - ./couchdb-data:/opt/couchdb/data
+      - ./couchdb-etc:/opt/couchdb/etc/local.d
+    ports:
+      - "127.0.0.1:5984:5984"
+    restart: unless-stopped
     networks:
       - web
 
