@@ -90,6 +90,7 @@ services:
     volumes:
       - ${DATA_STORAGE_BASE_DIR}/couchdb-data:/opt/couchdb/data
       - ${DATA_STORAGE_BASE_DIR}/couchdb-etc:/opt/couchdb/etc/local.d
+      - ./couchdb/local.d/10-cors.ini:/opt/couchdb/etc/local.d/10-cors.ini:ro
     ports:
       - "127.0.0.1:5984:5984"
     restart: unless-stopped
