@@ -96,15 +96,13 @@ ${DATA_STORAGE_BASE_DIR}/homeassistant/config
 
 After starting the stack for the first time:
 
-1. Complete onboarding at `http://<server-ip>:8123`.
-2. Open **Settings → System → Network** and enable **Trust X-Forwarded-For**.
-3. Add `172.30.0.2` as a trusted proxy and save the settings.
-4. Use `https://homeassistant.${DOMAIN}` for normal access.
+1. Open `https://homeassistant.${DOMAIN}`.
+2. Complete onboarding through the HTTPS endpoint.
 
-The fixed proxy address above belongs only to the private Docker network. If
-`172.30.0.0/24` overlaps another Docker or LAN network on the server, change the
-subnet and Caddy address together in `docker-compose.yml`, then use the new Caddy
-address as Home Assistant's trusted proxy.
+Caddy removes `X-Forwarded-For` before proxying requests, so Home Assistant does
+not require a fixed Caddy IP or trusted-proxy configuration. Consequently, Home
+Assistant sees Caddy as the source of proxied requests rather than the original
+client IP.
 
 ### Start All Services
 

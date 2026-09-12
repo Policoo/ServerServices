@@ -23,8 +23,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      web:
-        ipv4_address: 172.30.0.2
+      - web
 
   pihole:
     image: pihole/pihole:2026.05.0
@@ -118,6 +117,3 @@ services:
 networks:
   web:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.30.0.0/24
