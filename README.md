@@ -131,7 +131,6 @@ Once running, you can access:
 ## Future Services
 
 This setup is ready for additional services like:
-- Media servers (Plex, Jellyfin)
 - Monitoring (Grafana, Prometheus)
 - File sharing (Nextcloud)
 - And more! 
