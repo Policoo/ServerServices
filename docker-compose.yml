@@ -10,6 +10,7 @@ services:
       - filebrowser
       - netdata
       - couchdb
+      - homeassistant
     ports:
       - "80:80"
       - "443:443"
@@ -19,8 +20,11 @@ services:
       - ${DATA_STORAGE_BASE_DIR}/caddy/config:/config
     environment:
       DOMAIN: "${DOMAIN}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
-      - web
+      web:
+        ipv4_address: 172.30.0.2
 
   pihole:
     image: pihole/pihole:2026.05.0
@@ -97,6 +101,23 @@ services:
     networks:
       - web
 
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    stop_grace_period: 60s
+    privileged: true
+    environment:
+      TZ: "Europe/Amsterdam"
+    volumes:
+      - ${DATA_STORAGE_BASE_DIR}/homeassistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    network_mode: host
+
 networks:
   web:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24

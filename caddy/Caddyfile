@@ -27,3 +27,9 @@ couchdb.{$DOMAIN} {
 
 	reverse_proxy couchdb:5984
 }
+
+homeassistant.{$DOMAIN} {
+	tls internal
+
+	reverse_proxy host.docker.internal:8123
+}

@@ -3,6 +3,7 @@
 This project sets up a home server on a Raspberry Pi with Docker Compose, featuring:
 - **Pi-hole**: Network-wide ad blocking and DNS server
 - **Caddy**: Reverse proxy with LAN-only HTTPS using an internal CA
+- **Home Assistant**: Local home automation platform with network discovery support
 
 ## Quick Setup
 
@@ -25,6 +26,7 @@ issues LAN-only HTTPS certificates using its internal certificate authority.
 - Routes `filebrowser.${DOMAIN}` to the File Browser container
 - Routes `netdata.${DOMAIN}` to the Netdata container
 - Routes `couchdb.${DOMAIN}` to the CouchDB container
+- Routes `homeassistant.${DOMAIN}` to Home Assistant
 - Listens on ports 80 and 443
 
 For mobile apps that require HTTPS, install Caddy's local root certificate on
@@ -81,6 +83,29 @@ sudo chown -R $USER:$USER pihole/
 > # Restart Pi-hole's DNS service
 > pihole reloaddns
 > pihole reloadlists
+> ```
+
+### Home Assistant
+
+Home Assistant runs with host networking so that device discovery protocols work
+on the LAN. Its configuration is persisted in:
+
+```bash
+${DATA_STORAGE_BASE_DIR}/homeassistant/config
+```
+
+After starting the stack for the first time:
+
+1. Complete onboarding at `http://<server-ip>:8123`.
+2. Open **Settings → System → Network** and enable **Trust X-Forwarded-For**.
+3. Add `172.30.0.2` as a trusted proxy and save the settings.
+4. Use `https://homeassistant.${DOMAIN}` for normal access.
+
+The fixed proxy address above belongs only to the private Docker network. If
+`172.30.0.0/24` overlaps another Docker or LAN network on the server, change the
+subnet and Caddy address together in `docker-compose.yml`, then use the new Caddy
+address as Home Assistant's trusted proxy.
+
 ### Start All Services
 
 ```bash
@@ -100,13 +125,13 @@ Once running, you can access:
 
 - **Pi-hole Admin**: `http://pihole.your-domain.local/admin/`
   - Use the password you set in `PIHOLE_WEBPASS`
+- **Home Assistant**: `https://homeassistant.your-domain.local/`
 - **DNS Server**: Point your devices to your Pi's IP address (port 53)
 
 ## Future Services
 
 This setup is ready for additional services like:
 - Media servers (Plex, Jellyfin)
-- Home automation (Home Assistant)
 - Monitoring (Grafana, Prometheus)
 - File sharing (Nextcloud)
 - And more! 
