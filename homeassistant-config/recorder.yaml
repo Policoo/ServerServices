@@ -1,0 +1,2 @@
+# Retain detailed history and short-term statistics for 365 days.
+purge_keep_days: 365

@@ -102,6 +102,7 @@ services:
 
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
+    entrypoint: ["python3", "/usr/local/bin/homeassistant-init.py"]
     container_name: homeassistant
     restart: unless-stopped
     stop_grace_period: 60s
@@ -112,6 +113,8 @@ services:
       - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_182fd04d389eef11b438d9a661ce3355-if00-port0:/dev/ttyUSB0
     volumes:
       - ${DATA_STORAGE_BASE_DIR}/homeassistant/config:/config
+      - ./homeassistant-config/recorder.yaml:/config/recorder.yaml:ro
+      - ./homeassistant-config/init.py:/usr/local/bin/homeassistant-init.py:ro
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     network_mode: host
