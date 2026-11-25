@@ -102,6 +102,7 @@ services:
 
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
+    entrypoint: ["python3", "/usr/local/bin/homeassistant-init.py"]
     container_name: homeassistant
     restart: unless-stopped
     stop_grace_period: 60s
@@ -113,6 +114,7 @@ services:
     volumes:
       - ${DATA_STORAGE_BASE_DIR}/homeassistant/config:/config
       - ./homeassistant-config/recorder.yaml:/config/recorder.yaml:ro
+      - ./homeassistant-config/init.py:/usr/local/bin/homeassistant-init.py:ro
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     network_mode: host
