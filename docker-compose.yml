@@ -2,15 +2,9 @@ version: "3.8"
 
 services:
   caddy:
-    image: caddy:2-alpine
+    image: caddy:2.11.9-alpine
     container_name: caddy
     restart: unless-stopped
-    depends_on:
-      - pihole
-      - filebrowser
-      - netdata
-      - couchdb
-      - homeassistant
     ports:
       - "80:80"
       - "443:443"
@@ -26,7 +20,8 @@ services:
       - web
 
   pihole:
-    image: pihole/pihole:2026.05.0
+    scale: ${ENABLE_PIHOLE:-1}
+    image: pihole/pihole:2026.11.0
     container_name: pihole
     restart: unless-stopped
     environment:
@@ -45,7 +40,8 @@ services:
       - web
 
   filebrowser:
-    image: filebrowser/filebrowser:v2-s6
+    scale: ${ENABLE_FILEBROWSER:-1}
+    image: filebrowser/filebrowser:v2.63.23-s6
     container_name: filebrowser
     restart: unless-stopped
     environment:
@@ -60,7 +56,8 @@ services:
       - web
 
   netdata:
-    image: netdata/netdata:v1.47.4
+    scale: ${ENABLE_NETDATA:-1}
+    image: netdata/netdata:v2.13.0
     container_name: netdata
     restart: unless-stopped
     cap_add:
@@ -84,7 +81,8 @@ services:
       - web
 
   couchdb:
-    image: couchdb:3.5.2
+    scale: ${ENABLE_COUCHDB:-1}
+    image: couchdb:3.5.3
     container_name: couchdb
     user: 5984:5984
     environment:
@@ -101,7 +99,8 @@ services:
       - web
 
   homeassistant:
-    image: ghcr.io/home-assistant/home-assistant:stable
+    scale: ${ENABLE_HOMEASSISTANT:-1}
+    image: ghcr.io/home-assistant/home-assistant:2026.11.3
     entrypoint: ["python3", "/usr/local/bin/homeassistant-init.py"]
     container_name: homeassistant
     restart: unless-stopped
