@@ -104,6 +104,28 @@ not require a fixed Caddy IP or trusted-proxy configuration. Consequently, Home
 Assistant sees Caddy as the source of proxied requests rather than the original
 client IP.
 
+#### Recorder retention
+
+Detailed history and short-term statistics are retained for 90 days using the
+repository-managed `homeassistant-config/recorder.yaml`, mounted read-only at
+`/config/recorder.yaml`.
+
+On an existing installation, back up `${DATA_STORAGE_BASE_DIR}/homeassistant/config/configuration.yaml`
+and, after the new mount is deployed, add the following top-level entry to that
+file (merge any existing `recorder:` settings into the managed file first; do not
+add a duplicate key):
+
+```yaml
+recorder: !include recorder.yaml
+```
+
+For a new installation, complete onboarding and then add the same entry.
+Check the configuration in Home Assistant under Developer Tools → YAML, then
+restart Home Assistant. Future retention changes can be made in the tracked
+Recorder file and applied by redeployment. The existing database and other
+configuration files remain in the persistent directory. Previously purged history
+cannot be recovered, and database storage usage may increase.
+
 ### Start All Services
 
 ```bash
